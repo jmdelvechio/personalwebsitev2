@@ -5,8 +5,19 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const adminPass = req.headers.get("x-admin-password");
-  if (adminPass !== process.env.ADMIN_PASSWORD)
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  const expected = process.env.ADMIN_PASSWORD;
+
+  console.log("[admin-debug] received:", JSON.stringify(adminPass));
+  console.log("[admin-debug] expected:", JSON.stringify(expected));
+  console.log("[admin-debug] match:", adminPass === expected);
+
+  if (adminPass !== expected)
+    return NextResponse.json({ 
+      error: "Não autorizado",
+      debug_received_length: adminPass?.length ?? 0,
+      debug_expected_length: expected?.length ?? 0,
+      debug_match: adminPass === expected,
+    }, { status: 401 });
 
   const { data, error } = await supabaseAdmin()
     .from("posts")
