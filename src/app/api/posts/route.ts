@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const adminPass = req.headers.get("x-admin-password");
+  if (adminPass !== process.env.ADMIN_PASSWORD)
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+
   const { data, error } = await supabaseAdmin()
     .from("posts")
     .select("*")
