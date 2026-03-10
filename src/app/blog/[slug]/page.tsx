@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 import type { Post } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -13,17 +13,21 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const { data } = await supabase()
+  const { data } = await supabaseAdmin()
     .from("posts")
-    .select("title, excerpt")
+    .select("title, excerpt, cover_url")
     .eq("slug", params.slug)
     .single();
   if (!data) return { title: "Post não encontrado" };
-  return { title: `${data.title} — João Vechio`, description: data.excerpt };
+  return {
+    title: `${data.title} — João Vechio`,
+    description: data.excerpt,
+    openGraph: data.cover_url ? { images: [data.cover_url] } : undefined,
+  };
 }
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
-  const { data: post } = await supabase()
+  const { data: post } = await supabaseAdmin()
     .from("posts")
     .select("*")
     .eq("slug", params.slug)
@@ -37,8 +41,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
     <>
       <Navbar />
       <main className="min-h-screen bg-[#F5F2ED]">
-        {/* Header */}
-        <div className="pt-40 pb-20 bg-[#0A0A0A]">
+        <div className="pt-40 pb-16 bg-[#0A0A0A]">
           <div className="max-w-3xl mx-auto px-6">
             <Link
               href="/blog"
@@ -48,13 +51,11 @@ export default async function PostPage({ params }: { params: { slug: string } })
             </Link>
             <time className="text-xs tracking-widest uppercase text-[#C8572A] mb-6 block">
               {new Date(p.created_at).toLocaleDateString("pt-BR", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
+                day: "2-digit", month: "long", year: "numeric",
               })}
             </time>
             <h1
-              className="text-white"
+              className="text-white mb-6"
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
@@ -65,22 +66,25 @@ export default async function PostPage({ params }: { params: { slug: string } })
               {p.title}
             </h1>
             {p.excerpt && (
-              <p className="text-[#6B6560] text-lg mt-6 leading-relaxed">{p.excerpt}</p>
+              <p className="text-[#6B6560] text-lg leading-relaxed">{p.excerpt}</p>
             )}
           </div>
         </div>
 
-        {/* Content */}
-        <div className="max-w-3xl mx-auto px-6 py-20">
-          <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: p.content }}
-          />
+        {p.cover_url && (
+          <div className="max-w-3xl mx-auto px-6">
+            <div className="aspect-[16/7] overflow-hidden">
+              <img src={p.cover_url} alt={p.title} className="w-full h-full object-cover" />
+            </div>
+          </div>
+        )}
 
-          {/* Author card */}
+        <div className="max-w-3xl mx-auto px-6 py-20">
+          <div className="post-content" dangerouslySetInnerHTML={{ __html: p.content }} />
+
           <div className="mt-20 pt-10 border-t border-[#E0DAD3] flex items-center gap-6">
-            <div className="w-14 h-14 bg-[#0A0A0A] flex items-center justify-center shrink-0">
-              <span style={{ fontFamily: "var(--font-display)", color: "#C8572A", fontSize: "1.2rem" }}>JV</span>
+            <div className="w-14 h-14 bg-[#0A0A0A] shrink-0 overflow-hidden">
+              <img src="/foto-joao.png" alt="João Vechio" className="w-full h-full object-cover object-top" />
             </div>
             <div>
               <p className="font-medium text-[#0A0A0A]">João Vechio</p>
