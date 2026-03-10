@@ -5,7 +5,6 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useScrollReveal } from "@/lib/useScrollReveal";
-import { supabase } from "@/lib/supabase";
 import type { Post } from "@/lib/supabase";
 
 export default function Home() {
@@ -18,13 +17,15 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchPosts() {
-      const { data } = await supabase()
-        .from("posts")
-        .select("*")
-        .eq("published", true)
-        .order("created_at", { ascending: false })
-        .limit(3);
-      if (data) setPosts(data);
+      try {
+        const res = await fetch("/api/posts/public");
+        if (res.ok) {
+          const data = await res.json();
+          setPosts(data);
+        }
+      } catch (e) {
+        console.error("fetchPosts error", e);
+      }
     }
     fetchPosts();
   }, []);
