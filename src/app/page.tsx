@@ -18,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchPosts() {
-      const { data } = await supabase
+      const { data } = await supabase()
         .from("posts")
         .select("*")
         .eq("published", true)
@@ -167,16 +167,17 @@ export default function Home() {
               <div className="reveal order-2 lg:order-1">
                 <div className="relative">
                   <div className="aspect-[4/5] bg-[#E0DAD3] relative overflow-hidden">
-                    {/* Placeholder — swap with <Image> when photo arrives */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                      <div className="w-20 h-20 rounded-full bg-[#C8572A]/20 flex items-center justify-center">
-                        <span style={{ fontFamily: "var(--font-display)", fontSize: "2rem", color: "#C8572A" }}>JV</span>
-                      </div>
-                      <p className="text-xs text-[#6B6560] tracking-widest uppercase">Foto em breve</p>
-                    </div>
+                    <Image
+                      src="/foto-joao.png"
+                      alt="João Vechio"
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      priority
+                    />
                     {/* Decorative corner */}
-                    <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-[#C8572A]" />
-                    <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-[#C8572A]" />
+                    <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-[#C8572A] z-10" />
+                    <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-[#C8572A] z-10" />
                   </div>
                   {/* Floating card */}
                   <div className="absolute -bottom-8 -right-8 bg-[#0A0A0A] text-white p-6 w-48">

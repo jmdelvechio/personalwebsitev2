@@ -13,7 +13,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const { data } = await supabase
+  const { data } = await supabase()
     .from("posts")
     .select("title, excerpt")
     .eq("slug", params.slug)
@@ -23,7 +23,7 @@ export async function generateMetadata({
 }
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
-  const { data: post } = await supabase
+  const { data: post } = await supabase()
     .from("posts")
     .select("*")
     .eq("slug", params.slug)

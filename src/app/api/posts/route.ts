@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin()
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false });
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   if (!title || !slug || !content)
     return NextResponse.json({ error: "Campos obrigatórios: title, slug, content" }, { status: 400 });
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin()
     .from("posts")
     .insert({ title, slug, excerpt, content, published: published ?? false, cover_url })
     .select()
@@ -39,7 +39,7 @@ export async function PATCH(req: NextRequest) {
   const { id, ...updates } = body;
   if (!id) return NextResponse.json({ error: "ID necessário" }, { status: 400 });
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin()
     .from("posts")
     .update(updates)
     .eq("id", id)
@@ -58,7 +58,7 @@ export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
   if (!id) return NextResponse.json({ error: "ID necessário" }, { status: 400 });
 
-  const { error } = await supabaseAdmin.from("posts").delete().eq("id", id);
+  const { error } = await supabaseAdmin().from("posts").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

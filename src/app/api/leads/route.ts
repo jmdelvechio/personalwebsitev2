@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   const { email, name, source } = await req.json();
   if (!email) return NextResponse.json({ error: "Email obrigatório" }, { status: 400 });
 
-  const { error } = await supabaseAdmin.from("leads").upsert(
+  const { error } = await supabaseAdmin().from("leads").upsert(
     { email, name, source: source ?? "newsletter" },
     { onConflict: "email" }
   );
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin()
     .from("leads")
     .select("*")
     .order("created_at", { ascending: false });
